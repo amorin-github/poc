@@ -1,0 +1,37 @@
+
+###> symfony/framework-bundle ###
+/.env
+/.env.*
+!/.env.dist
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+### PHPStorm
+/.idea/
+###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> cs-fix ###
+.php-cs-fixer.cache
+/tools/php-cs-fixer/vendor/
+###< cs-fix ###
+
+###> code-coverage ###
+html/
+###< code-coverage ###

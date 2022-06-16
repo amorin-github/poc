@@ -1,0 +1,44 @@
+version: '3.6'
+
+services:
+  php:
+    build: ./docker/php
+    container_name: poc_php
+    volumes:
+      - .:/var/www/html/
+    ports:
+      - "7080:80"
+      - "7443:443"
+    depends_on:
+      - database
+    links:
+      - database
+    networks:
+      default:
+        aliases:
+          - poc_php.container
+
+  database:
+    image: postgres:12.10
+    container_name: poc_db
+    restart: unless-stopped
+    volumes:
+      - poc_db_data:/var/lib/postgresql/data
+    ports:
+      - "7654:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      default:
+        aliases:
+          - poc_db.container
+
+volumes:
+  poc_db_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
