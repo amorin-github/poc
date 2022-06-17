@@ -22,7 +22,7 @@ jobs:
     - name: Install symfony-cli
       run: |
         curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
-        apt install symfony-cli
+        sudo apt install symfony-cli
     - name: Copy .env.test.local
       run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
     - name: Cache Composer packages
