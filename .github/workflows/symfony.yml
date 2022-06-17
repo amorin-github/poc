@@ -21,7 +21,7 @@ jobs:
     # -- Symfony CLI
     - name: Install symfony-cli
       run: |
-        cp docker/php/symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
+        sudo cp docker/php/symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
         apt-get update
         apt-get install -y --no-install-recommends symfony-cli
     - name: Copy .env.test.local
