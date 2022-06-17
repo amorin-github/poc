@@ -30,5 +30,12 @@ jobs:
           ${{ runner.os }}-php-
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    # -- Symfony CLI
+    - name: Install symfony-cli
+      run: |
+        Copy symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
+        apt-get update
+        apt-get install -y --no-install-recommends symfony-cli
+    # -- Tests
     - name: Execute tests (Unit and Feature tests) via PHPUnit
-      run: symfony php bin/phpunit
+      run: composer test
