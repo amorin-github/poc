@@ -22,13 +22,4 @@ class CheckControllerTest extends WebTestCase
         $client->request('GET', '/check2');
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
-
-    public function testIndexFailOnPurpose()
-    {
-        $client = static::createClient();
-        // toto
-
-        $client->request('GET', '/check');
-        $this->assertResponseIsUnprocessable();
-    }
 }
