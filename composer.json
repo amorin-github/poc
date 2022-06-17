@@ -58,6 +58,14 @@
         ],
         "test": [
             "symfony php bin/phpunit"
+        ],
+        "cs-fix-ci": [
+            "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src --dry-run --diff",
+            "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix tests --dry-run --diff"
+        ],
+        "cs-fix": [
+            "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src",
+            "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix tests"
         ]
     },
     "conflict": {
