@@ -47,6 +47,9 @@ jobs:
     - name: Check requirements
       run: symfony check:requirements
 
+    - name: Check security
+      run: symfony check:security
+
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       run: |
         cp .env.ci .env.test
