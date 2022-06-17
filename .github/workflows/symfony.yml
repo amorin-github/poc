@@ -71,8 +71,8 @@ jobs:
     - name: Validate composer config
       run: composer validate --strict
 
-    - name: Composer Install
-      run: composer install --ansi --prefer-dist --no-interaction --no-progress
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Run PHPCSFixer
       run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
