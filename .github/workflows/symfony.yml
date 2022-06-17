@@ -30,11 +30,8 @@ jobs:
         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
         restore-keys: ${{ runner.os }}-composer-
 
-    - name: Composer Install
-      run: |
-        composer install --ansi --prefer-dist --no-interaction --no-progress
-        rm composer.lock
-        composer config platform.php ${{ matrix.php }}
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Run phpstan
       run: ./vendor/bin/phpstan
