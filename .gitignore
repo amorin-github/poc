@@ -3,6 +3,7 @@
 /.env
 /.env.*
 !/.env.dist
+!/.env.ci
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
