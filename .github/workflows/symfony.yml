@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  php-cs-fixer:
+  symfony:
     runs-on: ubuntu-latest
     steps:
     - name: Cancel Previous Runs
@@ -22,24 +22,33 @@ jobs:
         php-version: '7.4'
         extensions: ctype, iconv
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Get Composer Cache Directory
-      id: composer-cache-tools
-      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+    - name: Install symfony-cli
+      run: |
+        curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+        sudo apt install symfony-cli
 
-    - name: Cache Composer Directory
-      uses: actions/cache@v2
+    - name: Copy .env.test.local
+      run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
       with:
-        path: ${{ steps.composer-cache-tools.outputs.dir }}
-        key: ${{ runner.os }}-composer-tools-${{ hashFiles('**/tools/php-cs-fixer/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-tools-
-
-    - name: Validate composer config
-      run: composer validate --strict
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
 
     - name: Install Dependencies
-      run: composer install --working-dir=tools/php-cs-fixer -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-    - name: Run PHPCSFixer
-      run: composer cs-fix-ci
+    - name: Check requirements
+      run: symfony check:requirements
+
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
+      run: |
+        cp .env.ci .env.test
+        cp .env.ci .env
+        composer test
