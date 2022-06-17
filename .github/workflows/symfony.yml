@@ -21,9 +21,8 @@ jobs:
     # -- Symfony CLI
     - name: Install symfony-cli
       run: |
-        sudo cp docker/php/symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
-        apt-get update
-        apt-get install -y --no-install-recommends symfony-cli
+        curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+        apt install symfony-cli
     - name: Copy .env.test.local
       run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
     - name: Cache Composer packages
