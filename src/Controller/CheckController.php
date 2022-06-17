@@ -18,4 +18,14 @@ class CheckController extends AbstractController
             'path' => 'src/Controller/CheckController.php',
         ]);
     }
+
+    /**
+     * @Route("/foo", name="app_foo")
+     */
+    public function foo(): JsonResponse
+    {
+        return $this->json([
+            'foo' => 'bar',
+        ]);
+    }
 }
