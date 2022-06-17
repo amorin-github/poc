@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckControllerTest extends WebTestCase
 {
-    public function testIndexSuccess()
+    public function testIndexSuccess(): void
     {
         $client = static::createClient();
 
@@ -15,19 +15,11 @@ class CheckControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function testIndexFail()
+    public function testIndexFail(): void
     {
         $client = static::createClient();
 
         $client->request('GET', '/check2');
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-    }
-
-    public function testIndexFailOnPurpose()
-    {
-        $client = static::createClient();
-
-        $client->request('GET', '/check');
-        $this->assertResponseIsUnprocessable();
     }
 }
