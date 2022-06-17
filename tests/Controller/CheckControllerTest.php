@@ -26,6 +26,7 @@ class CheckControllerTest extends WebTestCase
     public function testIndexFailOnPurpose()
     {
         $client = static::createClient();
+        // toto
 
         $client->request('GET', '/check');
         $this->assertResponseIsUnprocessable();
