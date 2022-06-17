@@ -11,12 +11,6 @@ jobs:
   symfony-tests:
     runs-on: ubuntu-latest
     steps:
-    # -- Symfony CLI
-    - name: Install symfony-cli
-      run: |
-        cp docker/php/symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
-        apt-get update
-        apt-get install -y --no-install-recommends symfony-cli
     #  To automatically get bug fixes and new Php versions for shivammathur/setup-php,
     # change this to (see https://github.com/shivammathur/setup-php#bookmark-versioning):
     # uses: shivammathur/setup-php@v2
@@ -24,6 +18,12 @@ jobs:
       with:
         php-version: '7.4'
     - uses: actions/checkout@v3
+    # -- Symfony CLI
+    - name: Install symfony-cli
+      run: |
+        cp docker/php/symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
+        apt-get update
+        apt-get install -y --no-install-recommends symfony-cli
     - name: Copy .env.test.local
       run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
     - name: Cache Composer packages
