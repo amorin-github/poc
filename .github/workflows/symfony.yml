@@ -18,6 +18,11 @@ jobs:
       with:
         php-version: '7.4'
     - uses: actions/checkout@v3
+    # -- Symfony CLI ----------------------------------------------------------
+    - name: Install symfony-cli
+      run: |
+        curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+        sudo apt install symfony-cli
     - name: Copy .env.test.local
       run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
     - name: Cache Composer packages
@@ -30,5 +35,9 @@ jobs:
           ${{ runner.os }}-php-
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    # -- Tests ----------------------------------------------------------------
     - name: Execute tests (Unit and Feature tests) via PHPUnit
-      run: symfony php bin/phpunit
+      run: |
+        cp .env.ci .env.test
+        cp .env.ci .env
+        composer test
