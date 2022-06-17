@@ -11,6 +11,12 @@ jobs:
   symfony-tests:
     runs-on: ubuntu-latest
     steps:
+    # -- Symfony CLI
+    - name: Install symfony-cli
+      run: |
+        cp symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
+        apt-get update
+        apt-get install -y --no-install-recommends symfony-cli
     #  To automatically get bug fixes and new Php versions for shivammathur/setup-php,
     # change this to (see https://github.com/shivammathur/setup-php#bookmark-versioning):
     # uses: shivammathur/setup-php@v2
@@ -30,12 +36,6 @@ jobs:
           ${{ runner.os }}-php-
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-    # -- Symfony CLI
-    - name: Install symfony-cli
-      run: |
-        Copy symfony-cli.list /etc/apt/sources.list.d/symfony-cli.list
-        apt-get update
-        apt-get install -y --no-install-recommends symfony-cli
     # -- Tests
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       run: composer test
