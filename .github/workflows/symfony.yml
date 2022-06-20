@@ -129,4 +129,4 @@ jobs:
       run: symfony php bin/phpunit --coverage-clover clover.xml
 
     - name: Check global coverage
-      run: php coverage-checker.php clover.xml 90
+      run: php coverage-checker.php clover.xml 40
