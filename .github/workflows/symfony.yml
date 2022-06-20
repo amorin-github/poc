@@ -124,3 +124,9 @@ jobs:
         cp .env.ci .env.test
         cp .env.ci .env
         composer test
+
+    - name: Code coverage clover.xml
+      run: symfony php bin/phpunit --coverage-clover clover.xml
+
+    - name: Check global coverage
+      run: php coverage-checker.php clover.xml 90
