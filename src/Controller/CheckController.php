@@ -22,6 +22,7 @@ class CheckController extends AbstractController
     public function foo(): JsonResponse
     {
         return $this->json([
+            'message2' => 'ba2',
             'message' => 'bar',
         ]);
     }
