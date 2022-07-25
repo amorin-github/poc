@@ -18,4 +18,11 @@ class CheckController extends AbstractController
             'path' => 'src/Controller/CheckController.php',
         ]);
     }
+
+    public function foo(): JsonResponse
+    {
+        return $this->json([
+            'message' => 'bar',
+        ]);
+    }
 }
