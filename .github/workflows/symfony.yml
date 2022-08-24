@@ -8,7 +8,55 @@ permissions:
   contents: read
 
 jobs:
+  doctrine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:12.10
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: ctype, iconv, pdo, pdo_pgsql, pgsql, intl
+
+      - uses: actions/checkout@v3
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer Directory
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Run Migration
+        run: |
+          cp .env.ci .env
+          composer require --dev symfony/orm-pack
+          php bin/console doctrine:database:drop --if-exists --force
+          php bin/console doctrine:database:create
+          php bin/console doctrine:migrations:migrate
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:${{ job.services.postgres.ports[5432] }}/template?serverVersion=12.10&charset=utf8
+          DATABASE_MIGRATIONS_URL: postgres://postgres:postgres@127.0.0.1:${{ job.services.postgres.ports[5432] }}/template?serverVersion=12.10&charset=utf8
+
   phpstan:
+    needs: doctrine
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -30,7 +78,7 @@ jobs:
       run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
     - name: Cache Composer Directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -43,6 +91,7 @@ jobs:
       run: ./vendor/bin/phpstan
 
   php-cs-fixer:
+    needs: doctrine
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -60,13 +109,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Get Composer Cache Directory
-      id: composer-cache-tools
+      id: composer-cache
       run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
     - name: Cache Composer Directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
-        path: ${{ steps.composer-cache-tools.outputs.dir }}
+        path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-tools-${{ hashFiles('**/tools/php-cs-fixer/composer.lock') }}
         restore-keys: ${{ runner.os }}-composer-tools-
 
@@ -80,6 +129,7 @@ jobs:
       run: composer cs-fix-ci
 
   symfony:
+    needs: doctrine
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -92,23 +142,25 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
-        extensions: ctype, iconv, pdo, pdo_pgsql, pgsql, intl, opcache,
+        extensions: ctype, iconv, pdo, pdo_pgsql, pgsql, intl, opcache
 
     - uses: actions/checkout@v3
+
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Cache Composer Directory
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-tools-${{ hashFiles('**/tools/php-cs-fixer/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-tools-
 
     - name: Install symfony-cli
       run: |
         curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
         sudo apt install symfony-cli
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
 
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist

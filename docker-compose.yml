@@ -23,7 +23,7 @@ services:
     container_name: poc_db
     restart: unless-stopped
     volumes:
-      - poc_db_data:/var/lib/postgresql/data
+      - poc_db_data:/var/lib/postgresql/data:rw
     ports:
       - "7654:5432"
     environment:
@@ -37,6 +37,10 @@ services:
 
 volumes:
   poc_db_data:
+
+###> doctrine/doctrine-bundle ###
+  db-data:
+###< doctrine/doctrine-bundle ###
     driver: local
 
 networks:
