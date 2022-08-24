@@ -26,7 +26,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
-          extensions: ctype, iconv
+          extensions: ctype, iconv, pdo, pdo_pgsql, pgsql, intl
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -55,125 +55,125 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:${{ job.services.postgres.ports[5432] }}/template?charset=UTF-8
 
-  phpstan:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-    - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.9.0
-      with:
-        access_token: ${{ github.token }}
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        extensions: ctype, iconv
-
-    - uses: actions/checkout@v2
-
-    - name: Get Composer Cache Directory
-      id: composer-cache
-      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-    - name: Cache Composer Directory
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-
-
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-    - name: Run phpstan
-      run: ./vendor/bin/phpstan
-
-  php-cs-fixer:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-    - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.9.0
-      with:
-        access_token: ${{ github.token }}
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        extensions: ctype, iconv
-
-    - uses: actions/checkout@v2
-
-    - name: Get Composer Cache Directory
-      id: composer-cache-tools
-      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-    - name: Cache Composer Directory
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.composer-cache-tools.outputs.dir }}
-        key: ${{ runner.os }}-composer-tools-${{ hashFiles('**/tools/php-cs-fixer/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-tools-
-
-    - name: Validate composer config
-      run: composer validate --strict
-
-    - name: Install Dependencies
-      run: composer install --working-dir=tools/php-cs-fixer -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-    - name: Run PHPCSFixer
-      run: composer cs-fix-ci
-
-  symfony:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-    - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.9.0
-      with:
-        access_token: ${{ github.token }}
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        extensions: ctype, iconv, pdo, pdo_pgsql, pgsql, intl, opcache,
-
-    - uses: actions/checkout@v3
-
-    - name: Install symfony-cli
-      run: |
-        curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
-        sudo apt install symfony-cli
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-    - name: Check requirements
-      run: symfony check:requirements
-
-    - name: Check security
-      run: symfony check:security
-
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      run: |
-        cp .env.ci .env.test
-        cp .env.ci .env
-        composer test
-
-    - name: Code coverage clover.xml
-      run: symfony php bin/phpunit --coverage-clover clover.xml
-
-    - name: Check global coverage
-      run: php coverage-checker.php clover.xml 40
+#  phpstan:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 20
+#    steps:
+#    - name: Cancel Previous Runs
+#      uses: styfle/cancel-workflow-action@0.9.0
+#      with:
+#        access_token: ${{ github.token }}
+#
+#    - name: Setup PHP
+#      uses: shivammathur/setup-php@v2
+#      with:
+#        php-version: '7.4'
+#        extensions: ctype, iconv
+#
+#    - uses: actions/checkout@v2
+#
+#    - name: Get Composer Cache Directory
+#      id: composer-cache
+#      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+#
+#    - name: Cache Composer Directory
+#      uses: actions/cache@v2
+#      with:
+#        path: ${{ steps.composer-cache.outputs.dir }}
+#        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+#        restore-keys: ${{ runner.os }}-composer-
+#
+#    - name: Install Dependencies
+#      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+#
+#    - name: Run phpstan
+#      run: ./vendor/bin/phpstan
+#
+#  php-cs-fixer:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 20
+#    steps:
+#    - name: Cancel Previous Runs
+#      uses: styfle/cancel-workflow-action@0.9.0
+#      with:
+#        access_token: ${{ github.token }}
+#
+#    - name: Setup PHP
+#      uses: shivammathur/setup-php@v2
+#      with:
+#        php-version: '7.4'
+#        extensions: ctype, iconv
+#
+#    - uses: actions/checkout@v2
+#
+#    - name: Get Composer Cache Directory
+#      id: composer-cache-tools
+#      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+#
+#    - name: Cache Composer Directory
+#      uses: actions/cache@v2
+#      with:
+#        path: ${{ steps.composer-cache-tools.outputs.dir }}
+#        key: ${{ runner.os }}-composer-tools-${{ hashFiles('**/tools/php-cs-fixer/composer.lock') }}
+#        restore-keys: ${{ runner.os }}-composer-tools-
+#
+#    - name: Validate composer config
+#      run: composer validate --strict
+#
+#    - name: Install Dependencies
+#      run: composer install --working-dir=tools/php-cs-fixer -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+#
+#    - name: Run PHPCSFixer
+#      run: composer cs-fix-ci
+#
+#  symfony:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 20
+#    steps:
+#    - name: Cancel Previous Runs
+#      uses: styfle/cancel-workflow-action@0.9.0
+#      with:
+#        access_token: ${{ github.token }}
+#
+#    - name: Setup PHP
+#      uses: shivammathur/setup-php@v2
+#      with:
+#        php-version: '7.4'
+#        extensions: ctype, iconv, pdo, pdo_pgsql, pgsql, intl, opcache
+#
+#    - uses: actions/checkout@v3
+#
+#    - name: Install symfony-cli
+#      run: |
+#        curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+#        sudo apt install symfony-cli
+#
+#    - name: Cache Composer packages
+#      id: composer-cache
+#      uses: actions/cache@v3
+#      with:
+#        path: vendor
+#        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+#        restore-keys: |
+#          ${{ runner.os }}-php-
+#
+#    - name: Install Dependencies
+#      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+#
+#    - name: Check requirements
+#      run: symfony check:requirements
+#
+#    - name: Check security
+#      run: symfony check:security
+#
+#    - name: Execute tests (Unit and Feature tests) via PHPUnit
+#      run: |
+#        cp .env.ci .env.test
+#        cp .env.ci .env
+#        composer test
+#
+#    - name: Code coverage clover.xml
+#      run: symfony php bin/phpunit --coverage-clover clover.xml
+#
+#    - name: Check global coverage
+#      run: php coverage-checker.php clover.xml 40
